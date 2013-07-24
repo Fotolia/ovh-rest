@@ -9,9 +9,22 @@ module OVH
   class RESTError < StandardError; end
 
   class REST
+    API_URL = "https://api.ovh.com/1.0"
 
-    def initialize(api_key, api_secret, consumer_key, version = "1.0")
-      @api_url = "https://api.ovh.com/#{version}"
+    class << self
+      def generate_consumer_key(api_key, access_rules)
+        uri = URI.parse("#{API_URL}/auth/credential")
+        request = Net::HTTP::Post.new(uri.path, initheader = {"X-Ovh-Application" => api_key, "Content-type" => "application/json"})
+        request.body = access_rules.to_json
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        response = http.request(request)
+        JSON.parse(response.body)
+      end
+    end
+
+    def initialize(api_key, api_secret, consumer_key)
+      @api_url = API_URL
       @api_key, @api_secret, @consumer_key = api_key, api_secret, consumer_key
     end
 
