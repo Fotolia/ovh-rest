@@ -1,7 +1,14 @@
-module OVH
-  class APIError < StandardError; end
+require 'digest/sha1'
+require "uri"
+require 'net/http'
+require 'net/https'
+require 'json'
 
-  class API
+module OVH
+
+  class RESTError < StandardError; end
+
+  class REST
 
     def initialize(api_key, api_secret, consumer_key, version = "1.0")
       @api_url = "https://api.ovh.com/#{version}"
@@ -10,7 +17,7 @@ module OVH
 
     [:get, :post, :put, :delete].each do |method|
       define_method method do |endpoint, payload = nil|
-        raise APIError, "Invalid endpoint #{endpoint}, should match '/<service>/.*'" unless %r{^/\w+/.*$}.match(endpoint)
+        raise RESTError, "Invalid endpoint #{endpoint}, should match '/<service>/.*'" unless %r{^/\w+/.*$}.match(endpoint)
 
         url = @api_url + endpoint
         uri = URI.parse(url)
@@ -29,7 +36,7 @@ module OVH
         result = JSON.parse(response.body)
 
         unless response.is_a?(Net::HTTPSuccess)
-          raise APIError, "Error querying #{endpoint}: #{result["message"]}"
+          raise RESTError, "Error querying #{endpoint}: #{result["message"]}"
         end
 
         result
