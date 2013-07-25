@@ -53,7 +53,7 @@ puts JSON.pretty_generate(result)
 }
 
 # Send sms
-result = ovh.post("/sms/sms-xx12345-1"/jobs", {
+result = ovh.post("/sms/sms-xx12345-1/jobs", {
   "charset" => "UTF-8",
   "class" => "phoneDisplay",
   "coding" => "7bit",
