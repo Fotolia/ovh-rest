@@ -23,7 +23,6 @@ module OVH
       end
 
       def build_http_object(host, port)
-        proxy = ENV['https_proxy'] ? URI.parse(ENV['https_proxy']) : OpenStruct.new
         if ENV['https_proxy']
           proxy = URI.parse(ENV['https_proxy'])
           Net::HTTP::Proxy(proxy.host, proxy.port).new(host, port)
