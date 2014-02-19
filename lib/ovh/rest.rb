@@ -16,10 +16,20 @@ module OVH
         uri = URI.parse("#{API_URL}/auth/credential")
         request = Net::HTTP::Post.new(uri.path, initheader = {"X-Ovh-Application" => api_key, "Content-type" => "application/json"})
         request.body = access_rules.to_json
-        http = Net::HTTP.new(uri.host, uri.port)
+        http = build_http_object(uri.host, uri.port)
         http.use_ssl = true
         response = http.request(request)
         JSON.parse(response.body)
+      end
+
+      def build_http_object(host, port)
+        proxy = ENV['https_proxy'] ? URI.parse(ENV['https_proxy']) : OpenStruct.new
+        if ENV['https_proxy']
+          proxy = URI.parse(ENV['https_proxy'])
+          Net::HTTP::Proxy(proxy.host, proxy.port).new(host, port)
+        else
+          Net::HTTP.new(host, port)
+        end
       end
     end
 
@@ -43,7 +53,7 @@ module OVH
         request = Net::HTTP.const_get(method.capitalize).new(uri.path, initheader = headers)
         request.body = body
 
-        http = Net::HTTP.new(uri.host, uri.port)
+        http = REST.build_http_object(uri.host, uri.port)
         http.use_ssl = true
         response = http.request(request)
         result = JSON.parse(response.body)
