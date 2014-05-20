@@ -55,7 +55,7 @@ module OVH
         http = REST.build_http_object(uri.host, uri.port)
         http.use_ssl = true
         response = http.request(request)
-        result = JSON.parse(response.body)
+        result = response.body == "null" ? nil : JSON.parse(response.body)
 
         unless response.is_a?(Net::HTTPSuccess)
           raise RESTError, "Error querying #{endpoint}: #{result["message"]}"
