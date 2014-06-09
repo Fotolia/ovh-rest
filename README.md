@@ -77,6 +77,20 @@ puts JSON.pretty_generate(result)
 
 All methods and parameters are described on the API documentation
 
+## Change API URL
+
+It's possible to change the API url according to where your OVH account is located. To change the API url for generate_consumer_key use something like this:
+
+```ruby
+OVH::REST.generate_consumer_key("your_appKey", access, 'https://ca.api.ovh.com/1.0')
+```
+
+Or, for calling other methods:
+
+```ruby
+ovh = OVH::REST.new(apiKey, appSecret, consumerKey, 'https://ca.api.ovh.com/1.0')
+```
+
 ## Setup
 
 Only tested with MRI >= 1.9.3
