@@ -45,13 +45,20 @@ module OVH
 
         url = @api_url + endpoint
         uri = URI.parse(url)
-        body = payload.to_json unless payload.nil?
+        body = nil
+
+        # encode payload accordingly
+        if payload
+          method == :get ? uri.query = URI.encode_www_form(payload) : body = payload.to_json
+        end
 
         # create OVH authentication headers
-        headers = build_headers(method, url, body)
+        headers = build_headers(method, uri.to_s, body)
 
         # instanciate Net::HTTP::Get, Post, Put or Delete class
-        request = Net::HTTP.const_get(method.capitalize).new(uri.path, initheader = headers)
+        request_uri = uri.path
+        request_uri += '?' + uri.query if uri.query
+        request = Net::HTTP.const_get(method.capitalize).new(request_uri, initheader = headers)
         request.body = body
 
         http = REST.build_http_object(uri.host, uri.port)
